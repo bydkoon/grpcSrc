@@ -84,17 +84,17 @@ func main() {
 	}
 
 	var opts []grpc.ServerOption
-	//tlsCredentials, err := loadTLSCredentials()
-	//if err != nil {
-	//	log.Fatal("cannot load TLS credentials : ", err)
-	//
-	//}
+	tlsCredentials, err := loadTLSCredentials()
+	if err != nil {
+		log.Fatal("cannot load TLS credentials : ", err)
+
+	}
 
 	opts = append(opts) //grpc.InitialConnWindowSize(0),
 	//grpc.UnaryInterceptor(orderUnaryServerInterceptor),
-	//grpc.Creds(tlsCredentials),
-
+	grpc.Creds(tlsCredentials)
 	s := grpc.NewServer(opts...)
+
 	pb.RegisterGreeterServer(s, &server{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
