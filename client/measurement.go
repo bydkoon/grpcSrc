@@ -5,6 +5,7 @@ import (
 	"Src1/client/driver"
 	errors2 "Src1/client/errors"
 	"Src1/client/printer"
+	pb "Src1/proto"
 
 	"Src1/client/tls"
 	"context"
@@ -132,6 +133,7 @@ func worker(opts []grpc.DialOption, cfg cmd.Config, report printer.Report) *erro
 	start_time := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.TimeOut)*time.Second)
 	defer cancel()
+
 	tlsCredentials, err := tls.LoadTLSCredentials(&cfg)
 	opts = driver.GrpcOption(opts, &cfg, tlsCredentials)
 	conn, err := grpc.DialContext(ctx,
@@ -154,15 +156,15 @@ func worker(opts []grpc.DialOption, cfg cmd.Config, report printer.Report) *erro
 	go checkConnectivityStatusChan(ctx, conn, connectivity.Idle)
 	//conn, err := driver.Dial(address, driver.WithInsecure(), driver.WithBlock())
 	conn.GetState()
-	//c := pb.NewGreeterClient(conn)
+	c := pb.NewGreeterClient(conn)
 
-	//r, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: defaultMessage})
-	//if err != nil {
-	//	return errors2.New("could not greet:", "SayHello", err)
-	//log.Fatalf("could not greet: %v", err)
-	//}
+	r, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: defaultMessage})
+	if err != nil {
+		return errors2.New("could not greet:", "SayHello", err)
+	}
+
 	report.TrackReport.TrackCheck("sendEnd", time.Since(start_time))
-	//log.Printf("Greeting: %s", r.GetMessage())
+	log.Printf("Greeting: %s", r.GetMessage())
 	return nil
 }
 
