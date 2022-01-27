@@ -1,7 +1,7 @@
 package driver
 
 import (
-	"__TestSrc/gRpc_Study/Src1/client/cmd"
+	"Src1/client/cmd"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"

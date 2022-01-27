@@ -1,7 +1,7 @@
 package tls
 
 import (
-	"__TestSrc/gRpc_Study/Src1/client/cmd"
+	"Src1/client/cmd"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"

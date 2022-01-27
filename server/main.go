@@ -10,7 +10,7 @@ import (
 	"net"
 	"time"
 
-	pb "__TestSrc/gRpc_Study/Src1/proto"
+	pb "Src1/proto"
 
 	"google.golang.org/grpc"
 )

@@ -1,8 +1,12 @@
 package main
 
 import (
-	"__TestSrc/gRpc_Study/Src1/client/cmd"
-	"__TestSrc/gRpc_Study/Src1/client/printer"
+	"Src1/client/cmd"
+	"Src1/client/driver"
+	errors2 "Src1/client/errors"
+	"Src1/client/printer"
+
+	"Src1/client/tls"
 	"context"
 	"errors"
 	"fmt"
@@ -15,18 +19,13 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
-
-	"__TestSrc/gRpc_Study/Src1/client/driver"
-	errors2 "__TestSrc/gRpc_Study/Src1/client/errors"
-
-	"__TestSrc/gRpc_Study/Src1/client/tls"
 )
 
 const (
 	defaultHost    = "localhost"
 	defaultPort    = "50051"
 	defaultMessage = "hello man"
-	defaultCertPem = "C:\\Users\\K\\gopath\\src\\__TestSrc\\gRpc_Study\\Src1\\cert\\ca-cert.pem"
+	defaultCertPem = "C:\\Users\\K\\gopath\\src\\Src1\\cert\\ca-cert.pem"
 )
 
 var (

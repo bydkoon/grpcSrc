@@ -1,8 +1,8 @@
 package printer
 
 import (
-	"__TestSrc/gRpc_Study/Src1/client/cmd"
-	errors2 "__TestSrc/gRpc_Study/Src1/client/errors"
+	"Src1/client/cmd"
+	errors2 "Src1/client/errors"
 	"fmt"
 )
 
