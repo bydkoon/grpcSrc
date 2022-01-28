@@ -1,8 +1,8 @@
 package printer
 
 import (
-	"Src1/client/cmd"
 	errors2 "Src1/client/errors"
+	"Src1/client/runner"
 	"fmt"
 )
 
@@ -10,7 +10,7 @@ type ReportPrinter struct {
 	Report *printer.Report
 }
 
-func (r *Report) PrinterReport(err *errors2.Errors, cfg *cmd.Config) {
+func (r *Report) PrinterReport(err *errors2.Errors, cfg *runner.Config) {
 
 	report := fmt.Sprintf("address: %s \n", r.Address)
 	report += fmt.Sprintf("port: %d \n", r.Port)
