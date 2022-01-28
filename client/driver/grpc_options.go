@@ -1,13 +1,13 @@
 package driver
 
 import (
-	"Src1/client/cmd"
+	"Src1/client/runner"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
-func GrpcOption(opts []grpc.DialOption, cfg *cmd.Config, tlsCredentials credentials.TransportCredentials) []grpc.DialOption {
+func GrpcOption(opts []grpc.DialOption, cfg *runner.Config, tlsCredentials credentials.TransportCredentials) []grpc.DialOption {
 	//opts = append(opts) grpc.WithReturnConnectionError(),
 	//grpc.FailOnNonTempDialError(true),
 	//grpc.WithBlock(),

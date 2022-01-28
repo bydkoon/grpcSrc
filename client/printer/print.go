@@ -6,6 +6,10 @@ import (
 	"fmt"
 )
 
+type ReportPrinter struct {
+	Report *printer.Report
+}
+
 func (r *Report) PrinterReport(err *errors2.Errors, cfg *cmd.Config) {
 
 	report := fmt.Sprintf("address: %s \n", r.Address)

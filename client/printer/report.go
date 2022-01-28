@@ -2,11 +2,11 @@ package printer
 
 import (
 	"Src1/client/cmd"
+	"fmt"
 	"time"
 )
 
 type Report struct {
-	Name    string `json:"name,omitempty"`
 	Address string `json:"address"`
 	Port    int    `json:"port"`
 	Date    string `json:"date"`
@@ -32,9 +32,9 @@ func (t *TrackReport) Init() {
 	t.track = make(map[string]time.Duration)
 }
 
-func (r *Report) MakeReport(name string, cmd *cmd.Config, date time.Time) {
-	r.Name = name
-	r.Address = cmd.Host
-	r.Port = cmd.Port
-	r.Date = date.Format("2006-01-02")
+func (r *Report) MakeReport(cfg *cmd.Config) {
+
+	r.Address = fmt.Sprintf("%s:%v", cfg.Host, cfg.Port)
+	r.Port = cfg.Port
+	r.Date = time.Now().Format("2006-01-02")
 }

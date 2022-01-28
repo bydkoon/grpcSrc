@@ -1,85 +1,27 @@
 package main
 
 import (
-	"Src1/client/cmd"
 	"Src1/client/driver"
 	errors2 "Src1/client/errors"
 	"Src1/client/printer"
-	pb "Src1/proto"
-
 	"Src1/client/tls"
 	"context"
-	"errors"
 	"fmt"
 	"log"
-	"os"
 	"sync"
 	"time"
-
-	"github.com/alecthomas/kingpin"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )
 
-const (
-	defaultHost    = "localhost"
-	defaultPort    = "50051"
-	defaultMessage = "hello man"
-	defaultCertPem = "C:\\Users\\K\\gopath\\src\\Src1\\cert\\ca-cert.pem"
-)
-
-var (
-	skipVerify = kingpin.Flag("skipTLS", "Skip TLS client verification of the server's certificate chain and host name.").
-			Default("false").Short('s').Bool()
-
-	host = kingpin.Flag("host", "Hostname").Default(defaultHost).Short('h').String()
-
-	port = kingpin.Flag("port", "Port number").Default(defaultPort).Short('p').Int()
-
-	certPem = kingpin.Flag("cert", "TLS cert.pem").Default(defaultCertPem).PlaceHolder(" ").String()
-
-	totalCount = kingpin.Flag("totalCount", "total count").Default("1").Short('t').Int()
-
-	blockMode = kingpin.Flag("blockMode", "Dial BlockMode").Default("true").Short('b').Bool()
-
-	timeOut = kingpin.Flag("timeOut", "Time Out option").Default("1").Int()
-)
-
-// 프로그램 실행시 호출
-func init() {
-	// 커맨드 라인 명령: cmd> *.exe -name [value] : https://gobyexample.com/command-line-flags
-	//log.SetFlags(log.LstdFlags | log.Lshortfile)
-	//glog := grpclog.NewLoggerV2(os.Stdout, ioutil.Discard, ioutil.Discard)
-	//grpclog.SetLoggerV2(glog)
-	kingpin.Parse()
-
-}
-
-func main() {
-
+func mesasurement() {
+	var report printer.Report
+	report.MakeReport(cfg)
+	report.TrackReport.Init()
 	//sw := utils.NewStopWatch()
 	//sw.Start()
 	/*	pid := getGID()*/
-
-	var opts []grpc.DialOption
-	var cfg cmd.Config
-	var report printer.Report
-	report.TrackReport.Init()
-	args := os.Args[1:]
-
-	if len(args) > 1 {
-		//var cmdCfg cmd.Config
-		err := createConfigFromArgs(&cfg)
-		if err != nil {
-			kingpin.FatalIfError(err, "")
-			os.Exit(1)
-		}
-
-	}
-	start := time.Now()
-	fullAddr := fmt.Sprintf("%s:%v", cfg.Host, cfg.Port)
-	report.MakeReport(fullAddr, &cfg, start)
 
 	wg := new(sync.WaitGroup)
 	//for i :=0 ; i < cfg.TotalCount ; i++ {
@@ -116,7 +58,7 @@ func checkConnectivityStatusChan(ctx context.Context, conn *grpc.ClientConn, sou
 
 func createConfigFromArgs(config *cmd.Config) error {
 	if config == nil {
-		return errors.New("config cannot be nil")
+		return errors2.New("config cannot be nil")
 	}
 	config.Host = *host
 	config.Port = *port
