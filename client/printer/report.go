@@ -1,7 +1,7 @@
 package printer
 
 import (
-	"Src1/client/cmd"
+	"Src1/client/runner"
 	"fmt"
 	"time"
 )
@@ -32,7 +32,7 @@ func (t *TrackReport) Init() {
 	t.track = make(map[string]time.Duration)
 }
 
-func (r *Report) MakeReport(cfg *cmd.Config) {
+func (r *Report) MakeReport(cfg *runner.Config) {
 
 	r.Address = fmt.Sprintf("%s:%v", cfg.Host, cfg.Port)
 	r.Port = cfg.Port

@@ -1,15 +1,16 @@
 package tls
 
 import (
-	"Src1/client/cmd"
+	"Src1/client/runner"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"google.golang.org/grpc/credentials"
 	"io/ioutil"
+
+	"google.golang.org/grpc/credentials"
 )
 
-func LoadTLSCredentials(c *cmd.Config) (credentials.TransportCredentials, error) {
+func LoadTLSCredentials(c *runner.Config) (credentials.TransportCredentials, error) {
 	//Load certificate of the CA who signed server's certificate7
 	if c.SkipTLSVerify {
 		pemServerCA, err := ioutil.ReadFile(c.CertPem)

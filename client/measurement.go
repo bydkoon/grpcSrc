@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"Src1/client/runner"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )
@@ -56,9 +58,9 @@ func checkConnectivityStatusChan(ctx context.Context, conn *grpc.ClientConn, sou
 	}
 }
 
-func createConfigFromArgs(config *cmd.Config) error {
+func createConfigFromArgs(config *runner.Config) error {
 	if config == nil {
-		return errors2.New("config cannot be nil")
+		return errors2.New("config cannot be nil", "err")
 	}
 	config.Host = *host
 	config.Port = *port
@@ -71,7 +73,7 @@ func createConfigFromArgs(config *cmd.Config) error {
 	return nil
 }
 
-func worker(opts []grpc.DialOption, cfg cmd.Config, report printer.Report) *errors2.Errors {
+func worker(opts []grpc.DialOption, cfg runner.Config, report printer.Report) *errors2.Errors {
 	start_time := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.TimeOut)*time.Second)
 	defer cancel()
@@ -98,15 +100,15 @@ func worker(opts []grpc.DialOption, cfg cmd.Config, report printer.Report) *erro
 	go checkConnectivityStatusChan(ctx, conn, connectivity.Idle)
 	//conn, err := driver.Dial(address, driver.WithInsecure(), driver.WithBlock())
 	conn.GetState()
-	c := pb.NewGreeterClient(conn)
+	// c := pb.NewGreeterClient(conn)
 
-	r, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: defaultMessage})
-	if err != nil {
-		return errors2.New("could not greet:", "SayHello", err)
-	}
+	// r, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: defaultMessage})
+	// if err != nil {
+	// return errors2.New("could not greet:", "SayHello", err)
+	// }
 
 	report.TrackReport.TrackCheck("sendEnd", time.Since(start_time))
-	log.Printf("Greeting: %s", r.GetMessage())
+	// log.Printf("Greeting: %s", r.GetMessage())
 	return nil
 }
 
