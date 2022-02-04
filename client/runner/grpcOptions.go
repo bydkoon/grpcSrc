@@ -1,23 +1,21 @@
-package driver
+package runner
 
 import (
-	"Src1/client/runner"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
-func GrpcOption(opts []grpc.DialOption, cfg *runner.Config, tlsCredentials credentials.TransportCredentials) []grpc.DialOption {
+func GrpcOption(cfg *RunConfig, tlsCredentials credentials.TransportCredentials) []grpc.DialOption {
 	//opts = append(opts) grpc.WithReturnConnectionError(),
 	//grpc.FailOnNonTempDialError(true),
 	//grpc.WithBlock(),
-
-	if cfg.SkipTLSVerify {
+	var opts []grpc.DialOption
+	if cfg.skipVerify {
 		opts = append(opts, grpc.WithTransportCredentials(tlsCredentials))
 	} else {
 		opts = append(opts, grpc.WithInsecure())
 	}
-	if cfg.BlockMode {
+	if cfg.block {
 		opts = append(opts, grpc.WithBlock())
 	}
 

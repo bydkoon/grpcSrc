@@ -2,12 +2,10 @@ package main
 
 import (
 	"Src1/client/printer"
+	"Src1/client/runner"
 	"os"
 
-	"Src1/client/runner"
-
 	"github.com/alecthomas/kingpin"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -25,13 +23,16 @@ var (
 
 	port = kingpin.Flag("port", "Port number").Default(defaultPort).Short('p').Int()
 
-	certPem = kingpin.Flag("cert", "TLS cert.pem").Default(defaultCertPem).PlaceHolder(" ").String()
+	cert = kingpin.Flag("cert", "TLS cert.pem").Default(defaultCertPem).PlaceHolder(" ").String()
 
-	totalCount = kingpin.Flag("totalCount", "total count").Default("1").Short('t').Int()
+	totalRequest = kingpin.Flag("totalCount", "total count").Default("20").Short('n').Uint()
 
 	blockMode = kingpin.Flag("blockMode", "Dial BlockMode").Default("true").Short('b').Bool()
 
-	timeOut = kingpin.Flag("timeOut", "Time Out option").Default("1").Int()
+	timeOut = kingpin.Flag("timeOut", "Time Out option").Default("20s").Short('t').Duration()
+
+	rps = kingpin.Flag("rps", "Requests per second (RPS) rate limit for constant load schedule. Default is no rate limit.").
+		Default("0").Short('r').Uint()
 )
 
 // 프로그램 실행시 호출
@@ -45,24 +46,43 @@ func init() {
 }
 
 func main() {
-	var opts []grpc.DialOption
 	var cfg runner.Config
+	//var report printer.Report
+	//report.TrackReport.Init()
 
 	args := os.Args[1:]
-
 	if len(args) > 1 {
-		//var cmdCfg cmd.Config
 		err := createConfigFromArgs(&cfg)
 		if err != nil {
 			kingpin.FatalIfError(err, "")
 			os.Exit(1)
 		}
-
 	}
+	options := []runner.Option{runner.WithConfig(&cfg)}
+	c, _ := runner.NewConfig(cfg.Host, cfg.Port, options...)
+	report := runner.Run(c)
 
 	p := printer.ReportPrinter{
 		Report: report,
-		Out:    output,
 	}
 
+	p.Print()
+}
+
+func createConfigFromArgs(config *runner.Config) error {
+	if config == nil {
+		return nil
+	}
+
+	config.Host = *host
+	config.Port = *port
+	config.SkipTLSVerify = *skipVerify
+	config.Cert = *cert
+	config.TotalRequest = *totalRequest
+	config.TimeOut = runner.Duration(*timeOut)
+	config.BlockMode = *blockMode
+	config.RPS = *rps
+
+	//config.KeyPem = *keyPem
+	return nil
 }

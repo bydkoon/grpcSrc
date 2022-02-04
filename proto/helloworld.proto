@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "__TestSrc/gRpc_Study/Src1/proto";
+option go_package = "Src1/proto";
 
 package helloworld;
 
