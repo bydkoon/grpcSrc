@@ -2,16 +2,26 @@ package printer
 
 import (
 	"Src1/client/runner"
-	"fmt"
 	"time"
 )
 
-type Report struct {
-	Address string `json:"address"`
-	Port    int    `json:"port"`
-	Date    string `json:"date"`
+type ReportPrinter struct {
+	//Out    io.Writer
+	Report *runner.Reporter
+}
 
-	TrackReport TrackReport
+type Duration time.Duration
+
+type Report struct {
+	Address       string   `json:"address"`
+	Port          int      `json:"port"`
+	Date          string   `json:"date"`
+	BlockMode     bool     `json:"blockMode"`
+	SkipTLSVerify bool     `json:"skipTLS"`
+	CertPem       string   `json:"certPem"`
+	TimeOut       Duration `json:"timeOut"`
+	TotalCount    uint     `json:"TotalCount"`
+	TrackReport   TrackReport
 }
 
 type TrackReport struct {
@@ -32,9 +42,16 @@ func (t *TrackReport) Init() {
 	t.track = make(map[string]time.Duration)
 }
 
-func (r *Report) MakeReport(cfg *runner.Config) {
-
-	r.Address = fmt.Sprintf("%s:%v", cfg.Host, cfg.Port)
-	r.Port = cfg.Port
-	r.Date = time.Now().Format("2006-01-02")
-}
+//
+//func (r *Re) MakeReport(cfg *runner.Config) {
+//
+//	r.Address = fmt.Sprintf("%s:%v", cfg.Host, cfg.Port)
+//	r.Port = cfg.Port
+//	r.Date = time.Now().Format("2006-01-02")
+//	r.BlockMode = cfg.BlockMode
+//	r.SkipTLSVerify = cfg.SkipTLSVerify
+//	r.TimeOut = Duration(cfg.TimeOut)
+//	r.CertPem = cfg.Cert
+//	r.TotalCount = cfg.TotalRequest
+//
+//}
