@@ -4,9 +4,10 @@ import (
 	"Src1/utils"
 	"context"
 	"fmt"
-	"github.com/google/uuid"
+	guuid "github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
+	"sort"
 	"strconv"
 	"sync"
 	"time"
@@ -30,17 +31,17 @@ type Requester struct {
 
 // NewRequester creates a new requestor from the passed RunConfig
 func NewRequester(c *RunConfig) *Requester {
-	uid := uuid.NewString()
+	uuid := guuid.New().String()
 	reqr := &Requester{
 		config:    c,
-		uuid:      uid,
-		stopwatch: utils.NewStopWatchUUID(uid),
+		uuid:      uuid,
+		stopwatch: utils.NewStopWatchUUID(uuid),
 	}
 
 	return reqr
 }
 
-func (report *Worker) ErrorHandler(code string, message string, err error) *Worker {
+func (report *SubWorker) ErrorHandler(code string, message string, err error) *SubWorker {
 	report.ErrorCode = code
 	report.ErrorMessage = message
 	report.Error = err
@@ -100,21 +101,20 @@ func (b *Requester) runWorkers() *MainWorker {
 	wg.Add(b.config.TotalRequest)
 
 	fmt.Printf("%s:%d", b.config.host, b.config.port)
-
+	n := 0
+	wc := 0
 	for i := 0; i < b.config.TotalRequest; i++ {
 		go func(b *Requester) {
-			n := 0
-			wc := 0
 			wID := "g" + strconv.Itoa(wc) + "c" + strconv.Itoa(n)
 			worker := b.worker(wID)
 			reporter.addSimpleReports(*worker)
-			wc++
-			n++
+
 			defer wg.Done()
 
 		}(b)
 		time.Sleep(time.Duration(b.config.rps))
-
+		wc++
+		n++
 	}
 	wg.Wait()
 	reporter.EndTime = time.Now()
@@ -126,29 +126,43 @@ func (b *Requester) runWorkers() *MainWorker {
 
 func (r *MainWorker) Finish() {
 	// Slowest / Fastest
-	var s, f, totalLatenciesSec time.Duration
-	var latencies []float64
+	var totalLatenciesSec float64
+	var okLats []float64
 	//okLats := make([]float64, 0)
 	var errReport []SubWorker
+	var totalCount uint64
+	errCount := 0
+	for _, worker := range r.Workers {
 
-	for _, ar := range r.Workers {
-		sec := ar.EndTime
+		okLats = append(okLats, float64(worker.EndTime.Seconds()))
+		totalLatenciesSec += float64(worker.EndTime.Seconds())
 
-		latencies = append(latencies, float64(sec))
-		totalLatenciesSec += sec
+		if worker.Error != nil {
+			errReport = append(errReport, worker)
+			errCount += 1
 
-		if ar.Error != nil {
-			errReport = append(errReport, ar)
 		}
-
+		totalCount += 1
 	}
+	r.TotalCount = totalCount
+	r.Rps = int(float64(totalCount) / totalLatenciesSec)
+	sort.Float64s(okLats)
+	if len(okLats) > 0 {
+		var fastestNum, slowestNum float64
+		fastestNum = okLats[0]
+		slowestNum = okLats[len(okLats)-1]
 
-	r.Slowest = s
-	r.Fastest = f
+		r.Fastest = time.Duration(fastestNum * float64(time.Second))
+		r.Slowest = time.Duration(slowestNum * float64(time.Second))
+		r.Histogram = histogram(okLats, slowestNum, fastestNum)
+		r.LatencyDistribution = latencies(okLats)
+	}
+	//r.Slowest = s
+	//r.Fastest = f
 
-	//average := totalLatenciesSec / float64(r.TotalCount)
-	//r.Average = sum / time.Duration(len(ltr.SimpleTestReports))
-	//
+	average := totalLatenciesSec / float64(r.TotalCount)
+	r.Average = time.Duration(average * float64(time.Second))
+
 	//r.Histogram = calHistogram(latencies, float64(s), float64(f))
 	//
 	////

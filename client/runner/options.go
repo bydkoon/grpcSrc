@@ -59,7 +59,6 @@ func NewConfig(host string, port int, options ...Option) (*RunConfig, error) {
 	}
 
 	c.port = port
-
 	creds, err := LoadTLSCredentials(
 		c.skipVerify,
 		c.cert,
@@ -92,9 +91,11 @@ func fromConfig(cfg *Config) []Option {
 	options := make([]Option, 0, 4)
 	options = append(options,
 		WithTimeout(time.Duration(cfg.TimeOut)),
-		WithTotalRequests(cfg.TotalRequest),
+		WithTotalRequest(cfg.TotalRequest),
 		WithBlock(cfg.BlockMode),
 		WithInsecure(cfg.SkipTLSVerify),
+		WithHost(cfg.Host),
+		//WithPort(cfg.Port)
 	)
 	return options
 }
@@ -106,8 +107,14 @@ func WithTimeout(timeout time.Duration) Option {
 		return nil
 	}
 }
+func WithHost(v string) Option {
+	return func(o *RunConfig) error {
+		o.host = v
+		return nil
+	}
+}
 
-func WithTotalRequests(n uint) Option {
+func WithTotalRequest(n uint) Option {
 	return func(o *RunConfig) error {
 		o.TotalRequest = int(n)
 
@@ -125,4 +132,5 @@ func WithInsecure(v bool) Option {
 		o.insecure = v
 		return nil
 	}
+
 }

@@ -10,7 +10,6 @@ type Config struct {
 	TotalRequest  uint   `json:"TotalRequest" toml:"TotalRequest" yaml:"TotalRequest"`
 	SkipTLSVerify bool   `json:"skipTLS" toml:"skipTLS" yaml:"skipTLS"`
 	Cert          string `json:"cert" toml:"cert" yaml:"cert"`
-	KeyPem        string `json:"keyPem" toml:"keyPem" yaml:"keyPem"`
 	BlockMode     bool   `json:"blockMode" toml:"blockMode" yaml:"blockMode"`
 	//TimeOut    			   int    `json:"timeOut" toml:"timeOut" yaml:"timeOut"`
 	RPS     uint     `json:"rps" toml:"rps" yaml:"rps"`

@@ -35,10 +35,10 @@ type MainWorker struct {
 	Fastest time.Duration `json:"fastest"`
 	Slowest time.Duration `json:"slowest"`
 
-	Rps  int `json:"rps"`
-	lock sync.Mutex
-
-	Histogram []Bucket `json:"histogram"`
+	Rps                 int `json:"rps"`
+	lock                sync.Mutex
+	LatencyDistribution []LatencyDistribution `json:"latencyDistribution"`
+	Histogram           []Bucket              `json:"histogram"`
 }
 
 func newReporter(wID string) *SubWorker {

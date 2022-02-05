@@ -64,6 +64,7 @@ func main() {
 
 	p := printer.ReportPrinter{
 		Report: report,
+		Config: c,
 	}
 
 	p.Print()

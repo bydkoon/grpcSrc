@@ -8,6 +8,7 @@ import (
 type ReportPrinter struct {
 	//Out    io.Writer
 	Report *runner.Reporter
+	Config *runner.RunConfig
 }
 
 type Duration time.Duration

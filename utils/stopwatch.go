@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"time"
 )
 
@@ -12,9 +11,9 @@ type StopWatch struct {
 	trackingTime time.Time
 }
 
-func NewStopWatch() *StopWatch {
-	return NewStopWatchUUID(uuid.NewString())
-}
+//func NewStopWatch() *StopWatch {
+//	return NewStopWatchUUID(uuid.NewString())
+//}
 
 func (sw *StopWatch) Start() time.Time {
 	sw.StartTime = time.Now()
