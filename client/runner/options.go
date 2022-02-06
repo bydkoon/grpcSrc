@@ -8,33 +8,33 @@ import (
 
 type RunConfig struct {
 	// call settings
-	host              string
-	port              int
+	Host              string
+	Port              int
 	proto             string
 	enableCompression bool
 
-	creds        credentials.TransportCredentials
-	timeout      time.Duration
+	Creds        credentials.TransportCredentials
+	Timeout      time.Duration
 	TotalRequest int
-	cWorker      int
+	CWorker      int
 
 	// security settings
-	cert       string
-	skipVerify bool
-	insecure   bool
-	block      bool
+	Cert       string
+	SkipVerify bool
+	Insecure   bool
+	Block      bool
 
 	// concurrency
-	c int
+	C int
 
 	// load
-	rps              int
-	loadStart        uint
-	loadEnd          uint
-	loadStep         int
-	loadSchedule     string
-	loadDuration     time.Duration
-	loadStepDuration time.Duration
+	Rps              int
+	LoadStart        uint
+	LoadEnd          uint
+	LoadStep         int
+	LoadSchedule     string
+	LoadDuration     time.Duration
+	LoadStepDuration time.Duration
 }
 
 type Option func(*RunConfig) error
@@ -54,21 +54,21 @@ func NewConfig(host string, port int, options ...Option) (*RunConfig, error) {
 
 	// host and call may have been applied via options
 	// only override if not present
-	if c.host == "" {
-		c.host = strings.TrimSpace(host)
+	if c.Host == "" {
+		c.Host = strings.TrimSpace(host)
 	}
 
-	c.port = port
+	c.Port = port
 	creds, err := LoadTLSCredentials(
-		c.skipVerify,
-		c.cert,
+		c.SkipVerify,
+		c.Cert,
 	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	c.creds = creds
+	c.Creds = creds
 
 	return c, nil
 }
@@ -88,28 +88,43 @@ func WithConfig(cfg *Config) Option {
 }
 
 func fromConfig(cfg *Config) []Option {
-	options := make([]Option, 0, 4)
+	options := make([]Option, 0, 7)
 	options = append(options,
 		WithTimeout(time.Duration(cfg.TimeOut)),
 		WithTotalRequest(cfg.TotalRequest),
 		WithBlock(cfg.BlockMode),
 		WithInsecure(cfg.SkipTLSVerify),
 		WithHost(cfg.Host),
-		//WithPort(cfg.Port)
+		WithPort(cfg.Port),
+		WithCert(cfg.Cert),
 	)
 	return options
 }
 
 func WithTimeout(timeout time.Duration) Option {
 	return func(o *RunConfig) error {
-		o.timeout = timeout
+		o.Timeout = timeout
 
 		return nil
 	}
 }
-func WithHost(v string) Option {
+func WithHost(host string) Option {
 	return func(o *RunConfig) error {
-		o.host = v
+		o.Host = host
+		return nil
+	}
+}
+
+func WithPort(port int) Option {
+	return func(o *RunConfig) error {
+		o.Port = port
+		return nil
+	}
+}
+
+func WithCert(cert string) Option {
+	return func(o *RunConfig) error {
+		o.Cert = cert
 		return nil
 	}
 }
@@ -123,13 +138,13 @@ func WithTotalRequest(n uint) Option {
 }
 func WithBlock(block bool) Option {
 	return func(o *RunConfig) error {
-		o.block = block
+		o.Block = block
 		return nil
 	}
 }
 func WithInsecure(v bool) Option {
 	return func(o *RunConfig) error {
-		o.insecure = v
+		o.Insecure = v
 		return nil
 	}
 

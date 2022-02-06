@@ -40,7 +40,8 @@ func (t *TrackReport) errorCheck(name string, d time.Duration) {
 }
 
 func (t *TrackReport) Init() {
-	t.track = make(map[string]time.Duration)
+	t.track = make(
+		map[string]time.Duration)
 }
 
 //

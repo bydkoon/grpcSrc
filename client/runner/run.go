@@ -4,8 +4,6 @@ import (
 	"context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
-	"log"
-	"time"
 )
 
 func Run(c *RunConfig) *Reporter {
@@ -26,10 +24,10 @@ func checkConnectivityStatusChan(ctx context.Context, conn *grpc.ClientConn, sou
 
 	select {
 	case <-ctx.Done():
-		log.Println("Context is Done")
+		//log.Println("Context is Done")
 	case <-ch:
 		curState := conn.GetState()
-		log.Printf("Change channel state : %s > %s [%s]\r\n", sourceState.String(), curState.String(), time.Now())
+		//log.Printf("Change channel state : %s > %s [%s]\r\n", sourceState.String(), curState.String(), time.Now())
 		close(ch)
 		go checkConnectivityStatusChan(ctx, conn, curState)
 	}

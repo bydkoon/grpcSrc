@@ -10,12 +10,12 @@ func GrpcOption(cfg *RunConfig, tlsCredentials credentials.TransportCredentials)
 	//grpc.FailOnNonTempDialError(true),
 	//grpc.WithBlock(),
 	var opts []grpc.DialOption
-	if cfg.skipVerify {
+	if cfg.SkipVerify {
 		opts = append(opts, grpc.WithTransportCredentials(tlsCredentials))
 	} else {
 		opts = append(opts, grpc.WithInsecure())
 	}
-	if cfg.block {
+	if cfg.Block {
 		opts = append(opts, grpc.WithBlock())
 	}
 

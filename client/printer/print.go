@@ -9,8 +9,7 @@ import (
 )
 
 func (rp *ReportPrinter) Print() {
-	var config runner.Config
-	BasicReport(config)
+	BasicReport(rp)
 	summaryReport(rp)
 
 	//rp.C.BlockMode,
@@ -21,16 +20,16 @@ func (rp *ReportPrinter) Print() {
 	//return rp.print(buf.String())
 }
 
-func BasicReport(config runner.Config) {
+func BasicReport(rp *ReportPrinter) {
 	date := time.Now().Format("2006-01-02")
 	fmt.Printf(
 		DefaultTmpl,
-		config.Host,
-		config.Port,
+		rp.Config.Host,
+		rp.Config.Port,
 		date,
-		config.BlockMode,
-		config.TotalRequest,
-		config.Cert,
+		rp.Config.Block,
+		rp.Config.TotalRequest,
+		rp.Config.Cert,
 	)
 
 }
@@ -42,8 +41,10 @@ func summaryReport(rp *ReportPrinter) {
 		rp.Report.MainWorker.Fastest,
 		rp.Report.MainWorker.Average,
 		rp.Report.MainWorker.Rps,
+		rp.Report.MainWorker.ErrorCount,
 		histogramPrintString(rp.Report.MainWorker.Histogram),
 		LatencyDistributionString(rp.Report.MainWorker.LatencyDistribution),
+		ErrorString(rp.Report.MainWorker.ErrorReport),
 	)
 
 }
@@ -94,6 +95,14 @@ func LatencyDistributionString(latencyDistribution []runner.LatencyDistribution)
 	report := ""
 	for _, o := range latencyDistribution {
 		report += fmt.Sprintf("  %v  in %v\n", o.Percentage, o.Latency)
+	}
+	return report
+}
+
+func ErrorString(e []runner.Error) string {
+	report := ""
+	for _, o := range e {
+		report += fmt.Sprintf("  %s  , %s,  %v \n", o.Error, o.ErrorCode, o.ErrorMessage)
 	}
 	return report
 }

@@ -13,6 +13,10 @@ type SubWorker struct {
 	StartTime time.Duration
 	EndTime   time.Duration
 
+	Error Error
+}
+
+type Error struct {
 	ErrorCode    string
 	ErrorMessage string
 	Error        error
@@ -39,6 +43,9 @@ type MainWorker struct {
 	lock                sync.Mutex
 	LatencyDistribution []LatencyDistribution `json:"latencyDistribution"`
 	Histogram           []Bucket              `json:"histogram"`
+
+	ErrorCount  int `json:"errorCount"`
+	ErrorReport []Error
 }
 
 func newReporter(wID string) *SubWorker {

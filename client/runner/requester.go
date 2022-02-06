@@ -42,11 +42,17 @@ func NewRequester(c *RunConfig) *Requester {
 }
 
 func (report *SubWorker) ErrorHandler(code string, message string, err error) *SubWorker {
-	report.ErrorCode = code
-	report.ErrorMessage = message
-	report.Error = err
+	report.Error.ErrorCode = code
+	report.Error.ErrorMessage = message
+	report.Error.Error = err
 	return report
 }
+
+func (report *SubWorker) GetError() Error {
+
+	return report.Error
+}
+
 func (b *Requester) Run() *MainWorker {
 	//runWorkers()
 	b.start = time.Now()
@@ -57,24 +63,24 @@ func (b *Requester) Run() *MainWorker {
 
 func (b *Requester) worker(wID string) *SubWorker {
 	reporter := newReporter(wID)
-	ctx, cancel := context.WithTimeout(context.Background(), b.config.timeout*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), b.config.Timeout*time.Second)
 	defer cancel()
 	sw := b.stopwatch
-	tlsCredentials, err := LoadTLSCredentials(b.config.skipVerify, b.config.cert)
+	tlsCredentials, err := LoadTLSCredentials(b.config.SkipVerify, b.config.Cert)
 	opts := GrpcOption(b.config, tlsCredentials)
 	reporter.Start = sw.Start()
 	dur := sw.Track()
 	reporter.StartTime = dur
 
 	conn, err := grpc.DialContext(ctx,
-		fmt.Sprintf("%s:%d", b.config.host, b.config.port),
+		fmt.Sprintf("%s:%d", b.config.Host, b.config.Port),
 		opts...,
 	)
 	if err != nil {
 		return reporter.ErrorHandler("did not connect", "DialContext", err)
 	}
 
-	if b.config.block {
+	if b.config.Block {
 		go checkConnectivityStatusChan(ctx, conn, connectivity.Idle)
 	}
 	err = conn.Close()
@@ -100,7 +106,7 @@ func (b *Requester) runWorkers() *MainWorker {
 	var wg sync.WaitGroup
 	wg.Add(b.config.TotalRequest)
 
-	fmt.Printf("%s:%d", b.config.host, b.config.port)
+	fmt.Printf("%s:%d", b.config.Host, b.config.Port)
 	n := 0
 	wc := 0
 	for i := 0; i < b.config.TotalRequest; i++ {
@@ -108,17 +114,16 @@ func (b *Requester) runWorkers() *MainWorker {
 			wID := "g" + strconv.Itoa(wc) + "c" + strconv.Itoa(n)
 			worker := b.worker(wID)
 			reporter.addSimpleReports(*worker)
-
 			defer wg.Done()
 
 		}(b)
-		time.Sleep(time.Duration(b.config.rps))
+		time.Sleep(time.Duration(b.config.Rps))
 		wc++
 		n++
 	}
 	wg.Wait()
 	reporter.EndTime = time.Now()
-	reporter.Rps = b.config.rps
+	//reporter.Rps = b.config.Rps
 	reporter.Finish()
 
 	return reporter
@@ -129,7 +134,7 @@ func (r *MainWorker) Finish() {
 	var totalLatenciesSec float64
 	var okLats []float64
 	//okLats := make([]float64, 0)
-	var errReport []SubWorker
+	var errReport []Error
 	var totalCount uint64
 	errCount := 0
 	for _, worker := range r.Workers {
@@ -137,10 +142,9 @@ func (r *MainWorker) Finish() {
 		okLats = append(okLats, float64(worker.EndTime.Seconds()))
 		totalLatenciesSec += float64(worker.EndTime.Seconds())
 
-		if worker.Error != nil {
-			errReport = append(errReport, worker)
+		if worker.Error.ErrorCode != "" {
 			errCount += 1
-
+			errReport = append(errReport, worker.GetError())
 		}
 		totalCount += 1
 	}
@@ -162,6 +166,8 @@ func (r *MainWorker) Finish() {
 
 	average := totalLatenciesSec / float64(r.TotalCount)
 	r.Average = time.Duration(average * float64(time.Second))
+	r.ErrorCount = errCount
+	r.ErrorReport = errReport
 
 	//r.Histogram = calHistogram(latencies, float64(s), float64(f))
 	//

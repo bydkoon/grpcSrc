@@ -10,6 +10,7 @@ Options
 	Block: %v
 	totalCount: %v
 	cert: %s
+
 `
 
 	SummaryTmpl = `
@@ -19,12 +20,13 @@ Total   : %v
 		Fastest : %v
 		Average : %v
 		Request / sec : %v
+		ErrorCount: %v
 	
-	Response time Histogram :
-%s
-	Status Distribute :
-%s
-	Error
-%s
+Response time Histogram :
+	%s
+Status Distribute :
+	%s
+Error:
+	%s
 `
 )
