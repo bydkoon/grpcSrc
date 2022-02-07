@@ -6,12 +6,15 @@ import (
 	"google.golang.org/grpc/connectivity"
 )
 
-func Run(c *RunConfig) *Reporter {
+func Run(c *RunConfig) (*Reporter, error) {
 	report := &Reporter{}
-	reqr := NewRequester(c)
-	report.MainWorker = reqr.Run()
-
-	return report
+	r := NewRequester(c)
+	mainWorker, err := r.Run()
+	report.MainWorker = mainWorker
+	if err != nil {
+		return nil, err
+	}
+	return report, nil
 
 }
 

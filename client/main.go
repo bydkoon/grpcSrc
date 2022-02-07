@@ -3,6 +3,7 @@ package main
 import (
 	"Src1/client/printer"
 	"Src1/client/runner"
+	"fmt"
 	"os"
 
 	"github.com/alecthomas/kingpin"
@@ -60,8 +61,11 @@ func main() {
 	}
 	options := []runner.Option{runner.WithConfig(&cfg)}
 	c, _ := runner.NewConfig(cfg.Host, cfg.Port, options...)
-	report := runner.Run(c)
+	report, err := runner.Run(c)
 
+	if err != nil {
+		handleError(err)
+	}
 	p := printer.ReportPrinter{
 		Report: report,
 		Config: c,
@@ -86,4 +90,12 @@ func createConfigFromArgs(config *runner.Config) error {
 
 	//config.KeyPem = *keyPem
 	return nil
+}
+func handleError(err error) {
+	if err != nil {
+		if errString := err.Error(); errString != "" {
+			fmt.Fprintln(os.Stderr, errString)
+		}
+		os.Exit(1)
+	}
 }

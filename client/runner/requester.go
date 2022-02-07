@@ -18,19 +18,15 @@ type Requester struct {
 	start    time.Time
 	End      time.Time
 	//stopwatch *utils.StopWatch
-	uuid string
+	//uuid string
 }
 
 // NewRequester creates a new requestor from the passed RunConfig
 func NewRequester(c *RunConfig) *Requester {
-	//uuid := guuid.New().String()
-	reqr := &Requester{
+	r := &Requester{
 		config: c,
-		//uuid:      uuid,
-		//stopwatch: utils.NewStopWatchUUID(uuid),
 	}
-
-	return reqr
+	return r
 }
 
 func (report *SubWorker) ErrorHandler(code string, message string, err error) *SubWorker {
@@ -45,12 +41,20 @@ func (report *SubWorker) GetError() Error {
 	return report.Error
 }
 
-func (b *Requester) Run() *MainWorker {
+func (b *Requester) Run() (*MainWorker, error) {
 	//runWorkers()
+	err := ConnectionCheck(b.config)
+	if err != nil {
+		return nil, err
+	}
+
 	b.start = time.Now()
-	reporter := b.runWorkers()
+	reporter, err := b.runWorkers()
+	if err != nil {
+		return nil, err
+	}
 	b.End = time.Now()
-	return reporter
+	return reporter, nil
 }
 
 func (b *Requester) worker(wID string) *SubWorker {
@@ -70,7 +74,6 @@ func (b *Requester) worker(wID string) *SubWorker {
 	if err != nil {
 		return reporter.ErrorHandler("did not connect", "DialContext", err)
 	}
-
 	if !b.config.Block {
 		checkConnectivityStatusChan(ctx, conn, connectivity.Idle)
 	}
@@ -82,7 +85,7 @@ func (b *Requester) worker(wID string) *SubWorker {
 	return reporter
 }
 
-func (b *Requester) runWorkers() *MainWorker {
+func (b *Requester) runWorkers() (*MainWorker, error) {
 	reporter := newLoadReporter()
 	var wg sync.WaitGroup
 	wg.Add(b.config.TotalRequest)
@@ -106,8 +109,7 @@ func (b *Requester) runWorkers() *MainWorker {
 	reporter.EndTime = time.Now()
 	reporter.FinishTime = time.Since(b.start)
 	reporter.Finish()
-
-	return reporter
+	return reporter, nil
 }
 
 func (r *MainWorker) Finish() {
