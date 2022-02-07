@@ -2,7 +2,6 @@ package printer
 
 import (
 	"Src1/client/runner"
-	"time"
 )
 
 type ReportPrinter struct {
@@ -11,38 +10,38 @@ type ReportPrinter struct {
 	Config *runner.RunConfig
 }
 
-type Duration time.Duration
-
-type Report struct {
-	Address       string   `json:"address"`
-	Port          int      `json:"port"`
-	Date          string   `json:"date"`
-	BlockMode     bool     `json:"blockMode"`
-	SkipTLSVerify bool     `json:"skipTLS"`
-	CertPem       string   `json:"certPem"`
-	TimeOut       Duration `json:"timeOut"`
-	TotalCount    uint     `json:"TotalCount"`
-	TrackReport   TrackReport
-}
-
-type TrackReport struct {
-	track map[string]time.Duration
-}
-
-func (t *TrackReport) TrackCheck(name string, d time.Duration) {
-	t.track[name] = d
-	//t.Tracks = append(t.Tracks, track)
-}
-
-func (t *TrackReport) errorCheck(name string, d time.Duration) {
-	t.track[name] = d
-	//t.Tracks = append(t.Tracks, track)
-}
-
-func (t *TrackReport) Init() {
-	t.track = make(
-		map[string]time.Duration)
-}
+//type Duration time.Duration
+//
+//type Report struct {
+//	Address       string   `json:"address"`
+//	Port          int      `json:"port"`
+//	Date          string   `json:"date"`
+//	BlockMode     bool     `json:"blockMode"`
+//	SkipTLSVerify bool     `json:"skipTLS"`
+//	CertPem       string   `json:"certPem"`
+//	TimeOut       Duration `json:"timeOut"`
+//	TotalCount    uint     `json:"TotalCount"`
+//	TrackReport   TrackReport
+//}
+//
+//type TrackReport struct {
+//	track map[string]time.Duration
+//}
+//
+//func (t *TrackReport) TrackCheck(name string, d time.Duration) {
+//	t.track[name] = d
+//	//t.Tracks = append(t.Tracks, track)
+//}
+//
+//func (t *TrackReport) errorCheck(name string, d time.Duration) {
+//	t.track[name] = d
+//	//t.Tracks = append(t.Tracks, track)
+//}
+//
+//func (t *TrackReport) Init() {
+//	t.track = make(
+//		map[string]time.Duration)
+//}
 
 //
 //func (r *Re) MakeReport(cfg *runner.Config) {
