@@ -71,8 +71,8 @@ func (b *Requester) worker(wID string) *SubWorker {
 		return reporter.ErrorHandler("did not connect", "DialContext", err)
 	}
 
-	if b.config.Block {
-		go checkConnectivityStatusChan(ctx, conn, connectivity.Idle)
+	if !b.config.Block {
+		checkConnectivityStatusChan(ctx, conn, connectivity.Idle)
 	}
 	err = conn.Close()
 	if err != nil {

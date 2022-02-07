@@ -8,8 +8,8 @@ Base
 	date: %v
 Options
 	Block: %v
-	totalCount: %v
-	cert: %s
+	TotalRequest: %v
+	Cert: %s
 
 `
 
