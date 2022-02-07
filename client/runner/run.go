@@ -9,7 +9,6 @@ import (
 func Run(c *RunConfig) *Reporter {
 	report := &Reporter{}
 	reqr := NewRequester(c)
-
 	report.MainWorker = reqr.Run()
 
 	return report

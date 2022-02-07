@@ -44,7 +44,7 @@ func summaryReport(rp *ReportPrinter) {
 }
 
 const (
-	barChar = "⁕"
+	barChar = "⬛"
 )
 
 func LatencyDistributionString(latencyDistribution []runner.LatencyDistribution) string {

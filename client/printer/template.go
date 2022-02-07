@@ -23,10 +23,10 @@ Total   : %v
 		ErrorCount: %v
 	
 Response time Histogram :
-	%s
+%s
 Status Distribute :
-	%s
+%s
 Error:
-	%s
+%s
 `
 )

@@ -1,4 +1,4 @@
-package printer
+package v1
 
 //report := fmt.Sprintf("address: %s \n", r.Address)
 //report += fmt.Sprintf("port: %d \n", r.Port)

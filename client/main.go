@@ -25,7 +25,7 @@ var (
 
 	cert = kingpin.Flag("cert", "TLS cert.pem").Default(defaultCertPem).PlaceHolder(" ").String()
 
-	totalRequest = kingpin.Flag("totalCount", "total count").Default("20").Short('n').Uint()
+	totalRequest = kingpin.Flag("totalCount", "total count").Default("10").Short('n').Uint()
 
 	blockMode = kingpin.Flag("blockMode", "Dial BlockMode").Default("true").Short('b').Bool()
 

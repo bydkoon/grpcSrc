@@ -4,7 +4,6 @@ import (
 	"Src1/utils"
 	"context"
 	"fmt"
-	guuid "github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"sort"
@@ -13,29 +12,22 @@ import (
 	"time"
 )
 
-type callResult struct {
-	err       error
-	status    string
-	duration  time.Duration
-	timestamp time.Time
-}
-
 type Requester struct {
-	reporter  *Reporter
-	config    *RunConfig
-	start     time.Time
-	End       time.Time
-	stopwatch *utils.StopWatch
-	uuid      string
+	reporter *Reporter
+	config   *RunConfig
+	start    time.Time
+	End      time.Time
+	//stopwatch *utils.StopWatch
+	uuid string
 }
 
 // NewRequester creates a new requestor from the passed RunConfig
 func NewRequester(c *RunConfig) *Requester {
-	uuid := guuid.New().String()
+	//uuid := guuid.New().String()
 	reqr := &Requester{
-		config:    c,
-		uuid:      uuid,
-		stopwatch: utils.NewStopWatchUUID(uuid),
+		config: c,
+		//uuid:      uuid,
+		//stopwatch: utils.NewStopWatchUUID(uuid),
 	}
 
 	return reqr
@@ -65,13 +57,12 @@ func (b *Requester) worker(wID string) *SubWorker {
 	reporter := newReporter(wID)
 	ctx, cancel := context.WithTimeout(context.Background(), b.config.Timeout*time.Second)
 	defer cancel()
-	sw := b.stopwatch
+	sw := utils.NewStopWatch()
 	tlsCredentials, err := LoadTLSCredentials(b.config.SkipVerify, b.config.Cert)
 	opts := GrpcOption(b.config, tlsCredentials)
 	reporter.Start = sw.Start()
-	dur := sw.Track()
-	reporter.StartTime = dur
-
+	//startTrack := sw.Track()
+	//reporter.StartTime = startTrack
 	conn, err := grpc.DialContext(ctx,
 		fmt.Sprintf("%s:%d", b.config.Host, b.config.Port),
 		opts...,
@@ -95,7 +86,6 @@ func (b *Requester) runWorkers() *MainWorker {
 	reporter := newLoadReporter()
 	var wg sync.WaitGroup
 	wg.Add(b.config.TotalRequest)
-
 	fmt.Printf("%s:%d", b.config.Host, b.config.Port)
 	n := 0
 	wc := 0
@@ -103,7 +93,7 @@ func (b *Requester) runWorkers() *MainWorker {
 		go func(b *Requester) {
 			wID := "g" + strconv.Itoa(wc) + "c" + strconv.Itoa(n)
 			worker := b.worker(wID)
-			reporter.addSimpleReports(*worker)
+			reporter.addWorker(*worker)
 			defer wg.Done()
 
 		}(b)
@@ -112,8 +102,9 @@ func (b *Requester) runWorkers() *MainWorker {
 		n++
 	}
 	wg.Wait()
+	reporter.TotalCount = b.config.TotalRequest
 	reporter.EndTime = time.Now()
-	//reporter.Rps = b.config.Rps
+	reporter.FinishTime = time.Since(b.start)
 	reporter.Finish()
 
 	return reporter
@@ -121,24 +112,23 @@ func (b *Requester) runWorkers() *MainWorker {
 
 func (r *MainWorker) Finish() {
 	// Slowest / Fastest
-	var totalLatenciesSec float64
+	var LatenciesSec float64
 	var okLats []float64
 	var errReport []Error
-	var totalCount uint64
+	var SuccssCount uint64
 	errCount := 0
 	for _, worker := range r.Workers {
 
 		okLats = append(okLats, float64(worker.EndTime.Seconds()))
-		totalLatenciesSec += float64(worker.EndTime.Seconds())
-
 		if worker.Error.ErrorCode != "" {
 			errCount += 1
 			errReport = append(errReport, worker.GetError())
 		}
-		totalCount += 1
+		SuccssCount += 1
 	}
-	r.TotalCount = totalCount
-	r.Rps = int(float64(totalCount) / totalLatenciesSec)
+	LatenciesSec = float64(r.FinishTime.Seconds())
+	r.SuccssCount = SuccssCount
+	r.Rps = int(float64(r.TotalCount) / LatenciesSec)
 	sort.Float64s(okLats)
 	if len(okLats) > 0 {
 		var fastestNum, slowestNum float64
@@ -151,7 +141,7 @@ func (r *MainWorker) Finish() {
 		r.LatencyDistribution = latencies(okLats)
 	}
 
-	average := totalLatenciesSec / float64(r.TotalCount)
+	average := LatenciesSec / float64(r.TotalCount)
 	r.Average = time.Duration(average * float64(time.Second))
 	r.ErrorCount = errCount
 	r.ErrorReport = errReport

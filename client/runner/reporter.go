@@ -28,10 +28,11 @@ type MainWorker struct {
 	Name string    `json:"name,omitempty"`
 	Date time.Time `json:"date"`
 
-	StartTime time.Time
-	EndTime   time.Time
+	StartTime  time.Time
+	FinishTime time.Duration
+	EndTime    time.Time
 
-	TotalCount uint64 `json:"totalCount"`
+	TotalCount int `json:"totalCount"`
 
 	TotalDuration time.Duration `json:"totalDuration"`
 
@@ -44,7 +45,8 @@ type MainWorker struct {
 	LatencyDistribution []LatencyDistribution `json:"latencyDistribution"`
 	Histogram           []Bucket              `json:"histogram"`
 
-	ErrorCount  int `json:"errorCount"`
+	ErrorCount  int    `json:"errorCount"`
+	SuccssCount uint64 `json:"successCount"`
 	ErrorReport []Error
 }
 
@@ -55,7 +57,7 @@ func newReporter(wID string) *SubWorker {
 	}
 }
 
-func (ltr *MainWorker) addSimpleReports(target SubWorker) {
+func (ltr *MainWorker) addWorker(target SubWorker) {
 	ltr.lock.Lock()
 	ltr.Workers = append(ltr.Workers, target)
 	ltr.lock.Unlock()
@@ -69,8 +71,8 @@ type Reporter struct {
 	MainWorker *MainWorker
 	config     *RunConfig
 
-	id         string
-	totalCount uint64
+	id string
+	//totalCount uint64
 }
 type LatencyDistribution struct {
 	Percentage int           `json:"percentage"`

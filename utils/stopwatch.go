@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -10,31 +11,32 @@ type StopWatch struct {
 	trackingTime time.Time
 }
 
-//func NewStopWatch() *StopWatch {
-//	return NewStopWatchUUID(uuid.NewString())
-//}
+func NewStopWatch() *StopWatch {
+	return &StopWatch{
+		StartTime: time.Now(),
+	}
+}
 
 func (sw *StopWatch) Start() time.Time {
 	sw.StartTime = time.Now()
 	sw.trackingTime = time.Now()
 
-	//fmt.Printf("# [0s] %s >> Start \n", sw.convertDateFormat(sw.StartTime))
+	fmt.Printf("# [0s] %s >> Start \n", sw.convertDateFormat(sw.StartTime))
 	return sw.StartTime
 }
 
 func (sw *StopWatch) Track(flags ...string) time.Duration {
 	elapsed := time.Since(sw.trackingTime)
 	sw.trackingTime = time.Now()
-
-	//fmt.Printf("# [%v] %s >> Tracking \n", elapsed, flags)
+	fmt.Printf("# [%v] %s >> Tracking \n", elapsed, flags)
 	return elapsed
 }
 
 func (sw *StopWatch) Stop() (totalDuration time.Duration, endTime time.Time) {
 	elapsed_start := time.Since(sw.StartTime)
-	//elapsed_track := time.Since(sw.trackingTime)
+	elapsed_track := time.Since(sw.trackingTime)
 
-	//fmt.Printf("# [%v] %s >> Stop | Total laptime : %v \n", elapsed_track, sw.convertDateFormat(time.Now()), elapsed_start)
+	fmt.Printf("# [%v] %s >> Stop | Total laptime : %v \n", elapsed_track, sw.convertDateFormat(time.Now()), elapsed_start)
 	return elapsed_start, time.Now()
 }
 

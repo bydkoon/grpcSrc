@@ -16,7 +16,6 @@ type RunConfig struct {
 	Creds        credentials.TransportCredentials
 	Timeout      time.Duration
 	TotalRequest int
-	CWorker      int
 
 	// security settings
 	Cert       string
@@ -28,7 +27,7 @@ type RunConfig struct {
 	C int
 
 	// load
-	Rps              int
+	Rps              uint
 	LoadStart        uint
 	LoadEnd          uint
 	LoadStep         int
@@ -97,6 +96,7 @@ func fromConfig(cfg *Config) []Option {
 		WithHost(cfg.Host),
 		WithPort(cfg.Port),
 		WithCert(cfg.Cert),
+		WithRps(cfg.RPS),
 	)
 	return options
 }
@@ -125,6 +125,13 @@ func WithPort(port int) Option {
 func WithCert(cert string) Option {
 	return func(o *RunConfig) error {
 		o.Cert = cert
+		return nil
+	}
+}
+
+func WithRps(rps uint) Option {
+	return func(o *RunConfig) error {
+		o.Rps = rps
 		return nil
 	}
 }
