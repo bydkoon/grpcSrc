@@ -24,12 +24,15 @@ func BasicReport(rp *ReportPrinter) {
 		rp.Config.Block,
 		rp.Config.TotalRequest,
 		rp.Config.Cert,
+		rp.Config.Timeout,
 	)
 
 }
 func summaryReport(rp *ReportPrinter) {
 
 	fmt.Printf(SummaryTmpl,
+		rp.Report.MainWorker.StartTime.Format("2006-01-02 13:04:05"),
+		rp.Report.MainWorker.EndTime.Format("2006-01-02 13:04:05"),
 		rp.Report.MainWorker.TotalCount,
 		rp.Report.MainWorker.Slowest,
 		rp.Report.MainWorker.Fastest,

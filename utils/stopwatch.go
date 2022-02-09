@@ -34,9 +34,9 @@ func (sw *StopWatch) Track(flags ...string) time.Duration {
 
 func (sw *StopWatch) Stop() (totalDuration time.Duration, endTime time.Time) {
 	elapsed_start := time.Since(sw.StartTime)
-	elapsed_track := time.Since(sw.trackingTime)
+	//elapsed_track := time.Since(sw.trackingTime)
 
-	fmt.Printf("# [%v] %s >> Stop | Total laptime : %v \n", elapsed_track, sw.convertDateFormat(time.Now()), elapsed_start)
+	//fmt.Printf("# [%v] %s >> Stop | Total laptime : %v \n", elapsed_track, sw.convertDateFormat(time.Now()), elapsed_start)
 	return elapsed_start, time.Now()
 }
 

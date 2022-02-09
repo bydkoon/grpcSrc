@@ -10,16 +10,18 @@ Options
 	Block: %v
 	TotalRequest: %v
 	Cert: %s
+	TimeOut: %v
 
 `
-
 	SummaryTmpl = `
 Summary:
-Total   : %v
+		start time: %v
+		end time: %v
+		Total   : %v
 		Slowest : %v
 		Fastest : %v
 		Average : %v
-		Request / sec : %v
+		Request/sec : %v
 		ErrorCount: %v
 	
 Response time Histogram :

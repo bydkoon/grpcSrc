@@ -58,16 +58,17 @@ func NewConfig(host string, port int, options ...Option) (*RunConfig, error) {
 	}
 
 	c.Port = port
-	creds, err := LoadTLSCredentials(
-		c.SkipVerify,
-		c.Cert,
-	)
 
-	if err != nil {
-		return nil, err
+	if c.Cert != "" {
+		creds, err := LoadTLSCredentials(
+			c.SkipVerify,
+			c.Cert,
+		)
+		if err != nil {
+			return nil, err
+		}
+		c.Creds = creds
 	}
-
-	c.Creds = creds
 
 	return c, nil
 }

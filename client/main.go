@@ -4,16 +4,15 @@ import (
 	"Src1/client/printer"
 	"Src1/client/runner"
 	"fmt"
-	"os"
-
 	"github.com/alecthomas/kingpin"
+	"os"
 )
 
 const (
 	defaultHost    = "localhost"
 	defaultPort    = "50051"
 	defaultMessage = "hello man"
-	defaultCertPem = "C:\\Users\\K\\gopath\\src\\Src1\\cert\\ca-cert.pem"
+	//defaultCertPem = "C:\\Users\\K\\gopath\\src\\Src1\\cert\\ca-cert.pem"
 )
 
 var (
@@ -24,16 +23,20 @@ var (
 
 	port = kingpin.Flag("port", "Port number").Default(defaultPort).Short('p').Int()
 
-	cert = kingpin.Flag("cert", "TLS cert.pem").Default(defaultCertPem).PlaceHolder(" ").String()
+	cert = kingpin.Flag("cert", "TLS cert.pem").PlaceHolder(" ").String()
 
-	totalRequest = kingpin.Flag("totalCount", "total count").Default("10").Short('n').Uint()
+	call = kingpin.Flag("call", "Procedure call").String()
+
+	protoPath = kingpin.Flag("protoPath", "proto file path").String()
+
+	totalRequest = kingpin.Flag("totalCount", "total count").Default("1").Short('n').Uint()
 
 	blockMode = kingpin.Flag("blockMode", "Dial BlockMode").Default("true").Short('b').Bool()
 
 	timeOut = kingpin.Flag("timeOut", "Time Out option").Default("20s").Short('t').Duration()
 
 	rps = kingpin.Flag("rps", "Requests per second (RPS) rate limit for constant load schedule. Default is no rate limit.").
-		Default("0").Short('r').Uint()
+		Default("1").Short('r').Uint()
 )
 
 // 프로그램 실행시 호출
@@ -48,16 +51,11 @@ func init() {
 
 func main() {
 	var cfg runner.Config
-	//var report printer.Report
-	//report.TrackReport.Init()
-
-	args := os.Args[1:]
-	if len(args) > 1 {
-		err := createConfigFromArgs(&cfg)
-		if err != nil {
-			kingpin.FatalIfError(err, "")
-			os.Exit(1)
-		}
+	//args := os.Args[1:]
+	err := createConfigFromArgs(&cfg)
+	if err != nil {
+		kingpin.FatalIfError(err, "")
+		os.Exit(1)
 	}
 	options := []runner.Option{runner.WithConfig(&cfg)}
 	c, _ := runner.NewConfig(cfg.Host, cfg.Port, options...)
@@ -87,6 +85,8 @@ func createConfigFromArgs(config *runner.Config) error {
 	config.TimeOut = runner.Duration(*timeOut)
 	config.BlockMode = *blockMode
 	config.RPS = *rps
+	config.Call = *call
+	config.ProtoPath = *protoPath
 
 	//config.KeyPem = *keyPem
 	return nil

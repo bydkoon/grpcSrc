@@ -64,7 +64,9 @@ func (ltr *MainWorker) addWorker(target SubWorker) {
 }
 func newLoadReporter() *MainWorker {
 
-	return &MainWorker{}
+	return &MainWorker{
+		StartTime: time.Now(),
+	}
 }
 
 type Reporter struct {

@@ -1,11 +1,13 @@
 package runner
 
 import (
+	pb "Src1/proto"
 	"Src1/utils"
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
+	"log"
 	"sort"
 	"strconv"
 	"sync"
@@ -65,8 +67,7 @@ func (b *Requester) worker(wID string) *SubWorker {
 	tlsCredentials, err := LoadTLSCredentials(b.config.SkipVerify, b.config.Cert)
 	opts := GrpcOption(b.config, tlsCredentials)
 	reporter.Start = sw.Start()
-	//startTrack := sw.Track()
-	//reporter.StartTime = startTrack
+	fmt.Printf("%v", b.config)
 	conn, err := grpc.DialContext(ctx,
 		fmt.Sprintf("%s:%d", b.config.Host, b.config.Port),
 		opts...,
@@ -77,10 +78,18 @@ func (b *Requester) worker(wID string) *SubWorker {
 	if !b.config.Block {
 		checkConnectivityStatusChan(ctx, conn, connectivity.Idle)
 	}
-	err = conn.Close()
+	defer func(conn *grpc.ClientConn) {
+		err := conn.Close()
+		if err != nil {
+		}
+	}(conn)
+
+	c := pb.NewGreeterClient(conn)
+	r, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: "hello"})
 	if err != nil {
-		return reporter.ErrorHandler("connection close error", "CloseError", err)
+		reporter.ErrorHandler("Procedure call Error", fmt.Sprintf("could not greet: %v", err), err)
 	}
+	log.Printf("Greeting: %s", r.GetMessage())
 	reporter.EndTime, reporter.End = sw.Stop()
 	return reporter
 }
@@ -89,20 +98,17 @@ func (b *Requester) runWorkers() (*MainWorker, error) {
 	reporter := newLoadReporter()
 	var wg sync.WaitGroup
 	wg.Add(b.config.TotalRequest)
-	fmt.Printf("%s:%d", b.config.Host, b.config.Port)
 	n := 0
 	wc := 0
+	sleep := time.Second / time.Duration(b.config.Rps)
 	for i := 0; i < b.config.TotalRequest; i++ {
 		go func(b *Requester) {
 			wID := "g" + strconv.Itoa(wc) + "c" + strconv.Itoa(n)
 			worker := b.worker(wID)
 			reporter.addWorker(*worker)
-			defer wg.Done()
-
+			wg.Done()
 		}(b)
-		time.Sleep(time.Duration(b.config.Rps))
-		wc++
-		n++
+		time.Sleep(sleep)
 	}
 	wg.Wait()
 	reporter.TotalCount = b.config.TotalRequest

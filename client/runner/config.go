@@ -12,6 +12,8 @@ type Config struct {
 	Cert          string `json:"cert" toml:"cert" yaml:"cert"`
 	BlockMode     bool   `json:"blockMode" toml:"blockMode" yaml:"blockMode"`
 	//TimeOut    			   int    `json:"timeOut" toml:"timeOut" yaml:"timeOut"`
-	RPS     uint     `json:"rps" toml:"rps" yaml:"rps"`
-	TimeOut Duration `json:"timeout" toml:"timeout" yaml:"timeout" default:"1s"`
+	RPS       uint     `json:"rps" toml:"rps" yaml:"rps"`
+	Call      string   `json:"call" toml:"call" yaml:"call"`
+	ProtoPath string   `json:"protoPath" toml:"protoPath" yaml:"protoPath"`
+	TimeOut   Duration `json:"timeout" toml:"timeout" yaml:"timeout" default:"1s"`
 }
